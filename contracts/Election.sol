@@ -37,9 +37,31 @@ contract Election {
     mapping(uint=>Candidate) public candidates; // solidity gives a getter function
     // store candidates count
     uint public candidatesCount;
+
+    //store accounts that have voted
+    mapping(address=>bool) public voters;
     
     function addCandidate(string memory _name) private {
         candidatesCount++;
         candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
+    }
+
+    function vote(uint _candidateId) public {
+        //require that they haven't voted before
+        require(!voters[msg.sender]);
+        //require a valid candidate
+        require(_candidateId>0 && _candidateId<=candidatesCount);
+        //record that votes has voted
+        /*
+        solidity allows us to send the metadata and one of the data is about who is 
+        sending that information, the account key of that person
+        msg is part of the metadata
+        we use msg.sender to get the details to keep track of account who is voting.
+        */
+        //from is msg.sender
+        //any gas required in require won't be refunded if execution or transaction fails
+        voters[msg.sender] = true;
+        //update candidate vote count
+        candidates[_candidateId].voteCount ++;
     }
 }

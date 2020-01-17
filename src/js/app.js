@@ -26,7 +26,7 @@ App = {
   //loads out contract into the front end application, so that we can use it
   initContract: function(){
      //we have a browser sync package and it is configured to read json files in the build directory
-   console.log('hello');
+  //  console.log('hello');
      $.getJSON("Election.json", function(election){
       //Instantiate a new truffle contract from the artifact
       App.contracts.Election = TruffleContract(election);
@@ -38,9 +38,9 @@ App = {
 
   //laysout all the content on the page
   render: function(){
-      var electionInstance;
-      var loader = $("#loader");
-      var content = $("#content");
+      let electionInstance;
+      let loader = $("#loader");
+      let content = $("#content");
 
       //as we will be doing asynchronous execution
       loader.show();
@@ -58,19 +58,32 @@ App = {
           electionInstance = instance;
           return electionInstance.candidatesCount();
       }).then(function(candidatesCount){
-        var candidatesResults = $("#candidatesResults");
+        let candidatesResults = $("#candidatesResults");
         candidatesResults.empty();
 
-        for(var i=1; i<=candidatesCount; i++){
+        let candidatesSelect = $('#candidatesSelect');
+        candidatesSelect.empty();
+
+        for(let i=1; i<=candidatesCount; i++){
           electionInstance.candidates(i).then(function(candidate){
-            var id = candidate[0];
-            var name = candidate[1];
-            var voteCount = candidate[2];
+            let id = candidate[0];
+            let name = candidate[1];
+            let voteCount = candidate[2];
 
             //render candidate result
-            var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>";
+            let candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>";
             candidatesResults.append(candidateTemplate);
+
+            //render candidate ballot option
+            let candidateOption = "<option value= '" + id + "'>" + name + "</option>"
+            candidatesSelect.append(candidateOption);
           });
+        }
+        return electionInstance.voters(App.account);
+      }).then(function(hasVoted){
+        //do not allow the user to vote
+        if(hasVoted){
+          $('form').hide();
         }
         loader.hide();
         content.show();
@@ -78,8 +91,38 @@ App = {
         console.warn(err);
       })
 
+  },
+
+  // castVote : function(){
+  //   let candidateId = $('#candidatesSelect').val();
+  //   App.contracts.Election.deployed().then(function(instance){
+  //     console.log("hello")
+  //     return instance.vote(candidateId,{from:App.account});
+  //   }).then(function(result){
+  //     //wait for votes to update
+  //     console.log("hello");
+  //     $('#content').hide();
+  //     $('#loader').show();
+  //   }).catch(function(err){
+  //     console.error(err);
+  //   })
+
+  // },
+
+  castVote: function() {
+    let candidateId = $('#candidatesSelect').val();
+    App.contracts.Election.deployed().then(function(instance) {
+      return instance.vote(candidateId, {from:App.account});
+    }).then(function(result) {
+      // Wait for votes to update
+      $("#content").hide();
+      $("#loader").show();
+    }).catch(function(err) {
+      console.error(err);
+    });
   }
 };
+
 $(function() {
   $(window).load(function() {
     App.init();
