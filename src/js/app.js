@@ -32,7 +32,7 @@ App = {
       App.contracts.Election = TruffleContract(election);
       //connect proivder to interact with contract
       App.contracts.Election.setProvider(App.web3Provider);
-      // App.listenForEvents();
+    
       return App.render();
     });
   },
