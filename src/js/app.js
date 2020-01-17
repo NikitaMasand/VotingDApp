@@ -32,12 +32,27 @@ App = {
       App.contracts.Election = TruffleContract(election);
       //connect proivder to interact with contract
       App.contracts.Election.setProvider(App.web3Provider);
+      // App.listenForEvents();
       return App.render();
     });
   },
 
+  //listen for events emitted from the contract
+  // listenForEvents : function(){
+  //   App.contracts.Election.deployed().then(function(instance){
+  //     instance.votedEvent({},{
+  //       fromBlock : 0,
+  //       toBlock : 'latest'
+  //     }).watch(function(error,event){
+  //       console.log("event triggered",event);
+  //       //Reload whenever new vote is recorded
+  //       App.render();
+  //     })
+  //   })
+  // },
   //laysout all the content on the page
   render: function(){
+    console.log('hi')
       let electionInstance;
       let loader = $("#loader");
       let content = $("#content");

@@ -37,7 +37,10 @@ contract Election {
     mapping(uint=>Candidate) public candidates; // solidity gives a getter function
     // store candidates count
     uint public candidatesCount;
-
+    //voted event
+    // event votedEvent(
+    //     uint indexed _candidateId
+    // );
     //store accounts that have voted
     mapping(address=>bool) public voters;
     
@@ -63,5 +66,6 @@ contract Election {
         voters[msg.sender] = true;
         //update candidate vote count
         candidates[_candidateId].voteCount ++;
+        // emit votedEvent(_candidateId);
     }
 }
